@@ -113,6 +113,7 @@ class DockerServices(object):
         version: str,
         *,
         image: str = None,
+        replicas: int = None,
         rollback: bool = False,
     ) -> bool:
         """
@@ -127,14 +128,17 @@ class DockerServices(object):
         Returns:
             True if successful.
         """
-        if image is None and rollback is False:
-            raise ValueError("You need to specify an image.")
+        # if image is None and rollback is False:
+        #     raise ValueError("You need to specify an image.")
 
         inspect_service = await self.inspect(service_id)
         spec = inspect_service["Spec"]
 
         if image is not None:
             spec["TaskTemplate"]["ContainerSpec"]["Image"] = image
+
+        if replicas is not None:
+            spec["Mode"]["Replicated"]["Replicas"] = replicas
 
         params = {"version": version}
         if rollback is True:
